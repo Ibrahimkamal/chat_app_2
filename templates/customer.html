@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Customer Chat</h2>
+    <p>Welcome, {{ current_user.username }}! <a href="{{ url_for('logout') }}">Logout</a></p>
+    <div id="messages"></div>
+    <input type="text" id="message" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io();
+        socket.emit('join', {room: 'support_room'});
+
+        function sendMessage() {
+            var message = document.getElementById('message').value;
+            console.log(message);
+            socket.emit('send_message', {
+                message: message,
+                room: 'support_room',
+                sender: 'customer'
+            });
+            document.getElementById('message').value = '';
+        }
+
+        socket.on('receive_message', function(data) {
+            var messages = document.getElementById('messages');
+            console.log(data);
+            messages.innerHTML += '<p>' + data.sender + ': ' + data.message + '</p>';
+        });
+    </script>
+</body>
+</html>
